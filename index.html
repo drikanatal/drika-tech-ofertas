@@ -1,4 +1,4 @@
-<title>OfertaCerta</title>
+<title>Drika Tech Ofertas</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap">
@@ -173,6 +173,7 @@ header {
 .feat-img.amazon { background: var(--amz-bg); }
 .feat-img.shopee  { background: var(--shp-bg); }
 .feat-img.ml      { background: var(--ml-bg);  }
+.feat-img img { width: 100%; height: 100%; object-fit: contain; padding: 10px; box-sizing: border-box; }
 
 .feat-body { padding: 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
 
@@ -249,6 +250,7 @@ header {
   border-bottom: 1px solid var(--border);
   position: relative;
 }
+.card-img-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 10px; box-sizing: border-box; }
 
 /* Heart button */
 .card-heart {
@@ -329,9 +331,8 @@ header {
 }
 .trust-strip-inner {
   max-width: 900px; margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 32px;
+  display: flex;
+  justify-content: center;
   align-items: center;
 }
 .trust-cards {
@@ -375,8 +376,6 @@ header {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding-left: 16px;
-  border-left: 1px solid var(--border);
 }
 .trust-signature-text {
   font-family: 'Caveat', cursive;
@@ -391,15 +390,10 @@ header {
   font-size: 20px;
   color: #E879A0;
 }
+.trust-signature-row { display: flex; align-items: center; gap: 12px; }
+.trust-signature-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 @media (max-width: 780px) {
-  .trust-strip-inner {
-    grid-template-columns: 1fr;
-  }
   .trust-signature {
-    border-left: none;
-    border-top: 1px solid var(--border);
-    padding-left: 0;
-    padding-top: 16px;
     flex-direction: row;
     justify-content: center;
   }
@@ -532,13 +526,15 @@ footer strong { color: var(--text-muted); }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 8px;
   color: #4A3A9E;
   font-size: 13px;
   font-weight: 600;
+  overflow: hidden;
 }
 .hero-photo-placeholder span { font-size: 42px; }
+.hero-photo-img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .hero-handwritten {
   position: absolute;
   top: 16px;
@@ -607,7 +603,7 @@ footer strong { color: var(--text-muted); }
 <!-- HEADER -->
 <header>
   <div class="header-inner">
-    <div class="logo">Oferta<span>Certa</span></div>
+    <div class="logo">Drika Tech <span>Ofertas</span></div>
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input type="text" placeholder="Buscar produtos em oferta…">
@@ -630,14 +626,9 @@ footer strong { color: var(--text-muted); }
         </div>
         <div class="trust-item">
           <span class="trust-icon">🏷️</span>
-          Produtos que eu realmente uso
-        </div>
-        <div class="trust-item">
-          <span class="trust-icon">🤍</span>
-          Você compra e me apoia a continuar criando conteúdo
+          Produtos que eu uso ou pesquiso e indico!
         </div>
       </div>
-      <button class="hero-btn">Explorar produtos →</button>
     </div>
 
     <!-- CENTER: photo -->
@@ -647,8 +638,7 @@ footer strong { color: var(--text-muted); }
         <span class="hero-arrow">↘</span>
       </div>
       <div class="hero-photo-placeholder">
-        <span>📸</span>
-        Sua foto aqui
+        <img class="hero-photo-img" src="images/drika-foto.png" alt="Drika">
       </div>
     </div>
 
@@ -677,6 +667,7 @@ footer strong { color: var(--text-muted); }
 <div class="cat-bar">
   <div class="cat-inner">
     <div class="cat-tab active">Todos</div>
+    <!--
     <div class="cat-tab">Eletrônicos</div>
     <div class="cat-tab">Informática</div>
     <div class="cat-tab">Casa & Cozinha</div>
@@ -684,6 +675,7 @@ footer strong { color: var(--text-muted); }
     <div class="cat-tab">Beleza</div>
     <div class="cat-tab">Esporte</div>
     <div class="cat-tab">Bebê</div>
+    -->
   </div>
 </div>
 
@@ -694,34 +686,32 @@ footer strong { color: var(--text-muted); }
     <div class="sec-heading">⚡ Destaques do Dia</div>
     <div class="featured-grid">
 
-      <a href="#" class="featured-card" data-store="amazon">
-        <div class="feat-img amazon">🎧</div>
+      <a href="https://link.amazon/B0elyg7RC" class="featured-card" data-store="amazon" target="_blank" rel="noopener sponsored">
+        <div class="feat-img amazon"><img src="images/camera-ip-360.png" alt="Câmera Ip Sem Fio 360°"></div>
         <div class="feat-body">
           <div class="feat-store amazon"><span class="feat-dot amazon"></span>Amazon</div>
-          <div class="feat-title">Fone Bluetooth com Cancelamento de Ruído Ativo — 30h bateria</div>
-          <div class="feat-desc">ANC ativo · IPX4 · Codec aptX</div>
+          <div class="feat-title">Câmera Ip Sem Fio 360°</div>
+          <div class="feat-desc">Visão noturna · Wi-Fi · Monitoramento via app</div>
           <div class="feat-price-row">
-            <span class="feat-price amazon">R$ 189,90</span>
-            <span class="price-old">R$ 349,90</span>
-            <span class="discount-badge">−46%</span>
+            <span class="feat-price amazon">R$ 81,37</span>
           </div>
         </div>
         <button class="feat-cta amazon">Ver na Amazon →</button>
       </a>
 
-      <a href="#" class="featured-card" data-store="shopee">
-        <div class="feat-img shopee">💻</div>
+      <a href="https://link.amazon/B06mpnXto" class="featured-card" data-store="amazon" target="_blank" rel="noopener sponsored">
+        <div class="feat-img amazon"><img src="images/pontos-fortes-2.png" alt="Descubra seus pontos fortes 2.0"></div>
         <div class="feat-body">
-          <div class="feat-store shopee"><span class="feat-dot shopee"></span>Shopee</div>
-          <div class="feat-title">Notebook Lenovo IdeaPad 3 — Intel i5, 8GB RAM, SSD 256GB</div>
-          <div class="feat-desc">Windows 11 · Tela 15,6" Full HD</div>
+          <div class="feat-store amazon"><span class="feat-dot amazon"></span>Amazon</div>
+          <div class="feat-title">Descubra seus pontos fortes 2.0</div>
+          <div class="feat-desc">StrengthsFinder 2.0 · Instituto Gallup, Tom Rath</div>
           <div class="feat-price-row">
-            <span class="feat-price shopee">R$ 2.299</span>
-            <span class="price-old">R$ 3.199</span>
-            <span class="discount-badge">−28%</span>
+            <span class="feat-price amazon">R$ 103,40</span>
+            <span class="price-old">R$ 149,90</span>
+            <span class="discount-badge">−31%</span>
           </div>
         </div>
-        <button class="feat-cta shopee">Ver na Shopee →</button>
+        <button class="feat-cta amazon">Ver na Amazon →</button>
       </a>
 
       <!-- third featured card removed -->
@@ -733,6 +723,43 @@ footer strong { color: var(--text-muted); }
   <div class="sec-heading">🛍️ Todas as Ofertas</div>
   <div class="product-grid" id="grid">
 
+    <a href="https://link.amazon/B0748brIv" class="product-card" data-store="amazon" target="_blank" rel="noopener sponsored">
+      <div class="card-img-wrap"><img src="images/passador-slides.png" alt="Controle passador de slides para Aulas e Palestras"><button class="card-heart" onclick="event.preventDefault()">♡</button></div>
+      <div class="card-body">
+        <div class="card-name">Controle passador de slides para Aulas e Palestras</div>
+        <div class="card-desc">Apresentador sem fio · USB receptor</div>
+        <div class="card-price">
+          <div class="price-row">
+            <span class="price-main">R$ 21,90</span>
+          </div>
+        </div>
+        <div class="card-store-logo">
+          <div class="brand-logo"><img src="data:image/png;base64,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" alt="Amazon" style="height:28px;width:auto;object-fit:contain;"></div>
+        </div>
+      </div>
+      <button class="card-cta amazon">Ver na Amazon →</button>
+    </a>
+
+    <a href="https://link.amazon/B02PklJ4K" class="product-card" data-store="amazon" target="_blank" rel="noopener sponsored">
+      <div class="card-img-wrap"><img src="images/dualsense-marathon.png" alt="Controle sem fio PlayStation DualSense"><button class="card-heart" onclick="event.preventDefault()">♡</button></div>
+      <div class="card-body">
+        <div class="card-name">Controle sem fio PlayStation DualSense</div>
+        <div class="card-desc">Edição Limitada · PS5, PC/Mac, Mobile</div>
+        <div class="card-price">
+          <div class="price-row">
+            <span class="price-main">R$ 409,90</span>
+            <span class="price-old-sm">R$ 599,90</span>
+          </div>
+          <span class="discount-badge">−32%</span>
+        </div>
+        <div class="card-store-logo">
+          <div class="brand-logo"><img src="data:image/png;base64,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" alt="Amazon" style="height:28px;width:auto;object-fit:contain;"></div>
+        </div>
+      </div>
+      <button class="card-cta amazon">Ver na Amazon →</button>
+    </a>
+
+    <!--
     <a href="#" class="product-card" data-store="amazon">
       <div class="card-img-wrap">📱<button class="card-heart" onclick="event.preventDefault()">♡</button></div>
       <div class="card-body">
@@ -848,6 +875,7 @@ footer strong { color: var(--text-muted); }
       </div>
       <button class="card-cta ml">Ver no Mercado Livre →</button>
     </a>
+    -->
 
   </div>
 </main>
@@ -855,30 +883,11 @@ footer strong { color: var(--text-muted); }
 <!-- TRUST STRIP -->
 <section class="trust-strip">
   <div class="trust-strip-inner">
-    <div class="trust-cards">
-
-      <div class="trust-card">
-        <div class="trust-icon-wrap">🛡️</div>
-        <div class="trust-card-title">Compra segura</div>
-        <div class="trust-card-desc">Links oficiais das principais lojas do Brasil</div>
-      </div>
-
-      <div class="trust-card">
-        <div class="trust-icon-wrap">⭐</div>
-        <div class="trust-card-title">Produtos selecionados</div>
-        <div class="trust-card-desc">Só o que eu realmente uso e indico</div>
-      </div>
-
-      <div class="trust-card">
-        <div class="trust-icon-wrap">🤍</div>
-        <div class="trust-card-title">Você me apoia</div>
-        <div class="trust-card-desc">Comprando pelos meus links, você ajuda a manter o canal :)</div>
-      </div>
-
-    </div>
-
     <div class="trust-signature">
-      <div class="trust-signature-text">Obrigada<br>por estar<br>aqui!</div>
+      <div class="trust-signature-row">
+        <div class="trust-signature-text">Obrigada<br>por estar<br>aqui!</div>
+        <img class="trust-signature-avatar" src="images/drikatech-logo.jpg" alt="@drikatech">
+      </div>
       <div class="trust-signature-heart">♥ Drika</div>
     </div>
   </div>
@@ -890,7 +899,7 @@ footer strong { color: var(--text-muted); }
     <span class="footer-store-chip shopee">🛍️ Shopee Afiliados</span>
     <span class="footer-store-chip ml">🟡 Mercado Livre Afiliados</span>
   </div>
-  <p><strong>OfertaCerta</strong> — Curadoria de ofertas selecionadas</p>
+  <p><strong>Drika Tech Ofertas</strong> — Curadoria de ofertas selecionadas</p>
   <p style="margin-top:4px;">Este site participa dos Programas de Afiliados da Amazon, Shopee e Mercado Livre.<br>Ao clicar nos links e efetuar compras, podemos receber comissão sem custo adicional para você.</p>
 </footer>
 
