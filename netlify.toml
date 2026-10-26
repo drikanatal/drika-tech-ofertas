@@ -4,6 +4,9 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  # Economiza créditos: não faz deploy quando o envio muda só automações (.github) ou documentação (.md).
+  # Saída 0 do comando = a Netlify cancela o build.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude).github' ':(exclude)*.md' ':(exclude)**/*.md'"
 
 [build.environment]
   NODE_VERSION = "22"

@@ -1,0 +1,32 @@
+# Mantém o Supabase gratuito ativo: projetos Free pausam após 7 dias com pouca atividade no banco.
+# Faz uma leitura pública simples em "produtos" três vezes por semana (e pode ser rodado à mão).
+# Usa só a URL e a chave pública (anon); não gera deploy na Netlify.
+name: Manter Supabase ativo
+
+on:
+  schedule:
+    - cron: "0 12 * * 1,3,5" # segunda, quarta e sexta, 9h no horário de Brasília
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Consulta simples ao banco
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          status=$(curl -s -o resposta.json -w '%{http_code}' \
+            "$SUPABASE_URL/rest/v1/produtos?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "Resposta do Supabase: HTTP $status"
+          if [ "$status" != "200" ]; then
+            cat resposta.json
+            exit 1
+          fi
