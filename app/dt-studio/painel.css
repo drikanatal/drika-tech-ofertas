@@ -32,6 +32,15 @@
 .painel-erro { font-size: 12px; color: var(--shp-dark); font-weight: 600; }
 .painel-alerta { padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; }
 .painel-alerta.erro { background: var(--shp-bg); color: var(--shp-text); }
+.painel-alerta.aviso { background: #FEF9C3; color: #713F12; }
+.painel-alerta.ok { background: var(--discount-bg); color: var(--discount-text); }
+.spinner {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: girar 0.7s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
 .pendente { opacity: 0.6; pointer-events: none; transition: opacity 0.15s; }
 
 .painel-botao {

@@ -2,6 +2,7 @@
 
 import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { BUCKET_IMAGENS, caminhoNoBucket, copiarImagemExterna } from "@/lib/imagens";
 import { exigirAdmin } from "@/lib/painel";
 import { LOJAS_VALIDAS, ehUrl, gerarSlug, lerPreco, texto } from "@/lib/validacao";
 import type { Loja } from "@/lib/types";
@@ -46,13 +47,26 @@ export async function salvarProduto(_anterior: EstadoFormulario, form: FormData)
 
   if (Object.keys(erros).length > 0) return { erros };
 
+  // Foto de outro site (ex.: extraída da Amazon) é copiada para o Storage, para não depender da loja
+  let imagemFinal = imagem || null;
+  if (imagemFinal && ehUrl(imagemFinal) && !caminhoNoBucket(imagemFinal)) {
+    const copia = await copiarImagemExterna(supabase, imagemFinal);
+    if ("erro" in copia) return { erros: { imagem_url: copia.erro } };
+    imagemFinal = copia.url;
+  }
+
+  // Na edição, guarda a imagem anterior para apagar do Storage se ela foi trocada
+  const anterior = id
+    ? (await supabase.from("produtos").select("imagem_url").eq("id", id).maybeSingle()).data?.imagem_url ?? null
+    : null;
+
   const dados = {
     nome,
     link,
     loja,
     descricao: texto(form.get("descricao")) || null,
     descricao_longa: texto(form.get("descricao_longa")) || null,
-    imagem_url: imagem || null,
+    imagem_url: imagemFinal,
     preco_por: precoPor,
     preco_de: precoDe,
     categoria_id: texto(form.get("categoria_id")) || null,
@@ -65,6 +79,11 @@ export async function salvarProduto(_anterior: EstadoFormulario, form: FormData)
     ? await supabase.from("produtos").update(dados).eq("id", id)
     : await supabase.from("produtos").insert(dados);
   if (error) return { mensagem: `Não foi possível salvar: ${error.message}` };
+
+  const caminhoAnterior = caminhoNoBucket(anterior);
+  if (caminhoAnterior && anterior !== imagemFinal) {
+    await supabase.storage.from(BUCKET_IMAGENS).remove([caminhoAnterior]);
+  }
 
   atualizarVitrine();
   redirect("/dt-studio/produtos");
@@ -94,15 +113,6 @@ export async function excluirProduto(id: string) {
 
   atualizarVitrine();
   refresh();
-}
-
-const BUCKET_IMAGENS = "produtos";
-
-// Caminho do arquivo dentro do bucket, ou null para imagens de fora (URL externa ou /images/…)
-function caminhoNoBucket(url: string | null): string | null {
-  const marcador = `/storage/v1/object/public/${BUCKET_IMAGENS}/`;
-  const posicao = url?.indexOf(marcador) ?? -1;
-  return url && posicao >= 0 ? decodeURIComponent(url.slice(posicao + marcador.length)) : null;
 }
 
 // ── Categorias ──

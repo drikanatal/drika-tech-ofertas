@@ -3,20 +3,21 @@
 import Link from "next/link";
 import { useActionState, useState, type ChangeEvent } from "react";
 import { FeaturedCard, ProductCard } from "@/components/Cards";
+import type { ResultadoExtracao } from "@/lib/extracao";
+import { BUCKET_IMAGENS, TAMANHO_MAXIMO_IMAGEM, TIPOS_IMAGEM, extensaoDoTipo } from "@/lib/imagens";
 import { LOJAS } from "@/lib/lojas";
 import { criarClienteNavegador } from "@/lib/supabase/navegador";
 import type { Categoria, Loja, Produto, ProdutoPainel } from "@/lib/types";
 import { lerPreco } from "@/lib/validacao";
 import { salvarProduto, type EstadoFormulario } from "../acoes";
 
-const TIPOS_IMAGEM = ["image/jpeg", "image/png", "image/webp"];
-const TAMANHO_MAXIMO = 5 * 1024 * 1024;
+const textoPreco = (v: number | null | undefined) => (v == null ? "" : v.toFixed(2).replace(".", ","));
 
 type Props = { produto?: ProdutoPainel; categorias: Categoria[] };
 
 // Valores do formulário como texto, para os campos de preço aceitarem "129,90"
 function valoresIniciais(p?: ProdutoPainel) {
-  const preco = (v: number | null | undefined) => (v == null ? "" : v.toFixed(2).replace(".", ","));
+  const preco = textoPreco;
   return {
     link: p?.link ?? "",
     nome: p?.nome ?? "",
@@ -39,6 +40,46 @@ export function FormularioProduto({ produto, categorias }: Props) {
   const [enviandoImagem, setEnviandoImagem] = useState(false);
   const [erroImagem, setErroImagem] = useState<string | null>(null);
   const [detalhesPrevia, setDetalhesPrevia] = useState(false);
+  const [extraindo, setExtraindo] = useState(false);
+  const [extracao, setExtracao] = useState<{ tipo: "ok" | "aviso"; texto: string } | null>(null);
+
+  // Busca os dados pelo link e substitui os campos do formulário (nada é salvo até clicar em Salvar)
+  async function extrairDados() {
+    setExtraindo(true);
+    setExtracao(null);
+    let resultado: Partial<ResultadoExtracao>;
+    try {
+      const resposta = await fetch("/api/scrape", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: campos.link }),
+      });
+      resultado = await resposta.json();
+    } catch {
+      resultado = { sucesso: false, erro: "Não foi possível consultar a loja agora." };
+    }
+    setExtraindo(false);
+
+    if (resultado.nome) {
+      setCampos((atual) => ({
+        ...atual,
+        nome: resultado.nome ?? "",
+        descricao: resultado.descricao ?? "",
+        imagem_url: resultado.imagem_url ?? "",
+        preco_por: textoPreco(resultado.preco_por),
+        preco_de: textoPreco(resultado.preco_de),
+        loja: resultado.loja ?? atual.loja,
+      }));
+    } else if (resultado.loja) {
+      setCampos((atual) => ({ ...atual, loja: resultado.loja! }));
+    }
+
+    setExtracao(
+      resultado.sucesso
+        ? { tipo: "ok", texto: "Dados preenchidos. Confira e ajuste antes de salvar." }
+        : { tipo: "aviso", texto: `${resultado.erro ?? "Não foi possível extrair os dados"}. Preencha os campos manualmente.` },
+    );
+  }
 
   const erros = estado.erros ?? {};
   const alterar = (campo: keyof typeof campos) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -52,16 +93,15 @@ export function FormularioProduto({ produto, categorias }: Props) {
     if (!arquivo) return;
     setErroImagem(null);
     if (!TIPOS_IMAGEM.includes(arquivo.type)) return setErroImagem("Use uma imagem JPG, PNG ou WEBP.");
-    if (arquivo.size > TAMANHO_MAXIMO) return setErroImagem("A imagem deve ter no máximo 5 MB.");
+    if (arquivo.size > TAMANHO_MAXIMO_IMAGEM) return setErroImagem("A imagem deve ter no máximo 5 MB.");
 
     setEnviandoImagem(true);
-    const extensao = arquivo.type.split("/")[1].replace("jpeg", "jpg");
-    const caminho = `${crypto.randomUUID()}.${extensao}`;
+    const caminho = `${crypto.randomUUID()}.${extensaoDoTipo(arquivo.type)}`;
     const supabase = criarClienteNavegador();
-    const { error } = await supabase.storage.from("produtos").upload(caminho, arquivo, { contentType: arquivo.type });
+    const { error } = await supabase.storage.from(BUCKET_IMAGENS).upload(caminho, arquivo, { contentType: arquivo.type });
     setEnviandoImagem(false);
     if (error) return setErroImagem(`Não foi possível enviar a imagem: ${error.message}`);
-    const { data } = supabase.storage.from("produtos").getPublicUrl(caminho);
+    const { data } = supabase.storage.from(BUCKET_IMAGENS).getPublicUrl(caminho);
     setCampos((atual) => ({ ...atual, imagem_url: data.publicUrl }));
   }
 
@@ -95,19 +135,25 @@ export function FormularioProduto({ produto, categorias }: Props) {
       <form action={enviar} className="painel-form" noValidate>
         {produto && <input type="hidden" name="id" value={produto.id} />}
 
-        <Campo rotulo="Link da loja" erro={erros.link}>
+        <Campo rotulo="Link da loja" erro={erros.link} dica="Cole o link e clique em Extrair dados para preencher os campos.">
           <div className="painel-linha">
             <input name="link" type="url" placeholder="https://…" value={campos.link} onChange={alterar("link")} />
             <button
               type="button"
               className="painel-botao secundario"
-              disabled
-              title="A extração automática chega no Prompt 4"
+              onClick={extrairDados}
+              disabled={extraindo || !campos.link.trim()}
             >
-              Extrair dados
+              {extraindo && <span className="spinner" aria-hidden="true" />}
+              {extraindo ? "Extraindo…" : "Extrair dados"}
             </button>
           </div>
         </Campo>
+        {extracao && (
+          <p className={`painel-alerta ${extracao.tipo}`} role="status">
+            {extracao.texto}
+          </p>
+        )}
 
         <Campo rotulo="Nome" erro={erros.nome}>
           <input name="nome" value={campos.nome} onChange={alterar("nome")} />

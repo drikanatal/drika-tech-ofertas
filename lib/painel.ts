@@ -7,7 +7,8 @@ import type { Categoria, ProdutoPainel, UsuarioAutorizado } from "./types";
 
 // Camada de acesso do painel: toda leitura e Server Action passa por exigirAdmin(),
 // que confere a sessão e a role no próprio servidor (sem confiar no navegador).
-export const exigirAdmin = cache(async () => {
+// "sem-sessao" e "sem-acesso" deixam cada chamador decidir a resposta (redirect na página, 401/403 na API)
+export const lerAdmin = cache(async () => {
   // A sessão é sempre por requisição: o Supabase consulta o relógio para validar o token,
   // então o pré-render precisa parar aqui (senão o Next acusa Date.now() no pré-render)
   await connection();
@@ -15,17 +16,24 @@ export const exigirAdmin = cache(async () => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user?.email) redirect("/dt-studio");
+  if (!user?.email) return "sem-sessao" as const;
 
   const { data: perfil } = await supabase
     .from("usuarios_autorizados")
     .select("email, nome, role")
     .eq("email", user.email.toLowerCase())
     .maybeSingle();
-  if (!perfil || perfil.role !== "admin") redirect(DESTINO_SEM_ACESSO);
+  if (!perfil || perfil.role !== "admin") return "sem-acesso" as const;
 
   return { supabase, email: perfil.email as string, nome: (perfil.nome as string | null) ?? "Drika" };
 });
+
+export async function exigirAdmin() {
+  const admin = await lerAdmin();
+  if (admin === "sem-sessao") redirect("/dt-studio");
+  if (admin === "sem-acesso") redirect(DESTINO_SEM_ACESSO);
+  return admin;
+}
 
 const CAMPOS_PRODUTO =
   "id, nome, descricao, descricao_longa, imagem_url, preco_de, preco_por, link, loja, destaque, ativo, categoria_id, ordem";
