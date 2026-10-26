@@ -1,8 +1,12 @@
-# Next.js 16 na Netlify: a Netlify detecta o Next.js e aplica o runtime automaticamente.
-# (O antigo redirect /* → /index.html do site estático foi removido: ele quebraria as rotas do Next.js.)
+# Next.js 16 na Netlify com o runtime oficial declarado explicitamente
+# (sem ele, a Netlify publicou a pasta .next crua e tudo respondia 404).
+# O antigo redirect /* → /index.html do site estático foi removido: ele quebraria as rotas do Next.js.
 [build]
   command = "npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
