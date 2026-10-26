@@ -600,3 +600,33 @@ footer strong { color: var(--text-muted); }
 @media (prefers-reduced-motion: reduce) {
   .fav-painel, .fav-backdrop { transition: none; }
 }
+
+/* ── ENTRADA /dt-studio — mesmo fundo, fonte e raio da vitrine ── */
+.studio-entrar {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 24px 16px; background: var(--bg);
+}
+.studio-cartao {
+  width: min(360px, 100%);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow-sm);
+  padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 24px;
+}
+.studio-google {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 11px 16px; border: 1.5px solid var(--border); border-radius: 50px;
+  background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.studio-google:hover { border-color: var(--brand-2); box-shadow: var(--shadow-sm); }
+.studio-google:disabled { opacity: 0.7; cursor: wait; }
+.studio-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+.studio-erro { font-size: 12px; color: var(--shp-dark); text-align: center; }
+
+/* Página em branco para quem não tem acesso (/acesso) */
+.acesso-indisponivel {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 24px; background: #FFFFFF; color: #111827;
+  font-size: 18px; font-weight: 700; text-align: center;
+}
