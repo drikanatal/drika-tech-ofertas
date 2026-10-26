@@ -15,6 +15,16 @@ export type Produto = {
   ordem: number;
 };
 
+// Produto como o painel vê (inclui os inativos)
+export type ProdutoPainel = Produto & { ativo: boolean };
+
+export type UsuarioAutorizado = {
+  email: string;
+  nome: string | null;
+  role: "admin" | "viewer";
+  created_at: string;
+};
+
 export type Categoria = {
   id: string;
   nome: string;
