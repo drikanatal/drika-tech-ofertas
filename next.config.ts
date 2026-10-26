@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "127.0.0.1", port: "54321", pathname: "/storage/v1/object/public/**" },
       { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" },
     ],
+    // O Supabase local fica em 127.0.0.1; o Next 16 bloqueia IP local por padrão, então liberamos só fora da produção
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
   },
   turbopack: {
     rules: {

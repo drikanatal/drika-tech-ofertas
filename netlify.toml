@@ -1,4 +1,8 @@
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Next.js 16 na Netlify: a Netlify detecta o Next.js e aplica o runtime automaticamente.
+# (O antigo redirect /* → /index.html do site estático foi removido: ele quebraria as rotas do Next.js.)
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"

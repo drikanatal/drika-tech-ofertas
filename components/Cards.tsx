@@ -1,8 +1,14 @@
-/* eslint-disable @next/next/no-img-element -- otimização com next/image fica para o Prompt 5 */
+/* eslint-disable @next/next/no-img-element -- logos das lojas são PNGs pequenos, servidos como estão */
+import Image from "next/image";
 import type { MouseEvent } from "react";
 import { calcularDesconto, formatarPreco } from "@/lib/format";
 import { LOJAS } from "@/lib/lojas";
 import type { Produto } from "@/lib/types";
+
+// Só otimiza imagens do site ou do Storage; foto ainda na loja (prévia do painel) é exibida como está
+function semOtimizar(src: string) {
+  return !src.startsWith("/") && !src.includes("/storage/v1/object/public/");
+}
 
 // Botões dentro do card não podem abrir o link da loja
 function semNavegar(acao: () => void) {
@@ -70,7 +76,15 @@ export function ProductCard({ produto, favorito, onAlternarFavorito, ...detalhes
       rel="noopener sponsored"
     >
       <div className="card-img-wrap">
-        {produto.imagem_url && <img src={produto.imagem_url} alt={produto.nome} />}
+        {produto.imagem_url && (
+          <Image
+            src={produto.imagem_url}
+            alt={produto.nome}
+            fill
+            sizes="(max-width: 360px) 100vw, (max-width: 640px) 50vw, 240px"
+            unoptimized={semOtimizar(produto.imagem_url)}
+          />
+        )}
         <BotaoFavorito favorito={favorito} onAlternarFavorito={onAlternarFavorito} />
       </div>
       <div className="card-body">
@@ -110,7 +124,15 @@ export function FeaturedCard({ produto, favorito, onAlternarFavorito, ...detalhe
       rel="noopener sponsored"
     >
       <div className={`feat-img ${produto.loja}`}>
-        {produto.imagem_url && <img src={produto.imagem_url} alt={produto.nome} />}
+        {produto.imagem_url && (
+          <Image
+            src={produto.imagem_url}
+            alt={produto.nome}
+            fill
+            sizes="(max-width: 640px) 100vw, 600px"
+            unoptimized={semOtimizar(produto.imagem_url)}
+          />
+        )}
         <BotaoFavorito favorito={favorito} onAlternarFavorito={onAlternarFavorito} />
       </div>
       <div className="feat-body">

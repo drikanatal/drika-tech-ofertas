@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export function TrustStrip() {
   return (
     <section className="trust-strip">
@@ -11,8 +13,13 @@ export function TrustStrip() {
               <br />
               aqui!
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element -- otimização com next/image fica para o Prompt 5 */}
-            <img className="trust-signature-avatar" src="/images/drikatech-logo.jpg" alt="@drikatech" />
+            <Image
+              className="trust-signature-avatar"
+              src="/images/drikatech-logo.jpg"
+              alt="@drikatech"
+              width={52}
+              height={52}
+            />
           </div>
           <div className="trust-signature-heart">♥ Drika</div>
         </div>

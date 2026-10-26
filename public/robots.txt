@@ -1,2 +1,4 @@
 User-agent: *
 Disallow: /dt-studio
+
+Sitemap: https://drikatech.com.br/sitemap.xml

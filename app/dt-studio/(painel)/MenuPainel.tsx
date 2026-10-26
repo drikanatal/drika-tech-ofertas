@@ -9,20 +9,27 @@ const ITENS = [
   { href: "/dt-studio/usuarios", rotulo: "✉️ E-mails autorizados" },
 ] as const;
 
-export function MenuPainel() {
-  const caminho = usePathname();
+// Menu sem item ativo: vai no pré-render (fallback do Suspense) enquanto a URL não é conhecida
+export function MenuLinks({ caminho = "" }: { caminho?: string }) {
   return (
     <nav className="painel-menu" aria-label="Seções do painel">
-      {ITENS.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={caminho.startsWith(item.href) ? "ativo" : undefined}
-          aria-current={caminho.startsWith(item.href) ? "page" : undefined}
-        >
-          {item.rotulo}
-        </Link>
-      ))}
+      {ITENS.map((item) => {
+        const ativo = caminho.startsWith(item.href);
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={ativo ? "ativo" : undefined}
+            aria-current={ativo ? "page" : undefined}
+          >
+            {item.rotulo}
+          </Link>
+        );
+      })}
     </nav>
   );
+}
+
+export function MenuPainel() {
+  return <MenuLinks caminho={usePathname()} />;
 }

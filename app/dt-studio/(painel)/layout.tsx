@@ -3,7 +3,7 @@ import { Suspense, type ReactNode } from "react";
 import { exigirAdmin } from "@/lib/painel";
 import "../painel.css";
 import { sair } from "./acoes";
-import { MenuPainel } from "./MenuPainel";
+import { MenuLinks, MenuPainel } from "./MenuPainel";
 
 export const metadata: Metadata = {
   title: "Drika Tech Ofertas",
@@ -29,7 +29,9 @@ export default function LayoutPainel({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div className="painel-corpo">
-        <MenuPainel />
+        <Suspense fallback={<MenuLinks />}>
+          <MenuPainel />
+        </Suspense>
         <main className="painel-conteudo">{children}</main>
       </div>
     </div>
