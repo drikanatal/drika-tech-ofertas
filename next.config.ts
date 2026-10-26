@@ -13,6 +13,23 @@ const nextConfig: NextConfig = {
     // O Supabase local fica em 127.0.0.1; o Next 16 bloqueia IP local por padrão, então liberamos só fora da produção
     dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
   },
+  // Cabeçalhos recomendados pelo guia de PWA do Next.js para o service worker e o manifesto do painel
+  async headers() {
+    return [
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self'" },
+        ],
+      },
+      {
+        source: "/manifest-painel.webmanifest",
+        headers: [{ key: "Content-Type", value: "application/manifest+json; charset=utf-8" }],
+      },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {

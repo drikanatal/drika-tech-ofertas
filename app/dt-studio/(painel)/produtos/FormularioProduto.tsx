@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState, type ChangeEvent } from "react";
 import { FeaturedCard, ProductCard } from "@/components/Cards";
 import type { ResultadoExtracao } from "@/lib/extracao";
+import { comprimirImagem } from "@/lib/comprimirImagem";
 import { BUCKET_IMAGENS, TAMANHO_MAXIMO_IMAGEM, TIPOS_IMAGEM, extensaoDoTipo } from "@/lib/imagens";
 import { LOJAS } from "@/lib/lojas";
 import { criarClienteNavegador } from "@/lib/supabase/navegador";
@@ -42,6 +43,16 @@ export function FormularioProduto({ produto, categorias }: Props) {
   const [detalhesPrevia, setDetalhesPrevia] = useState(false);
   const [extraindo, setExtraindo] = useState(false);
   const [extracao, setExtracao] = useState<{ tipo: "ok" | "aviso"; texto: string } | null>(null);
+
+  // "Colar" lê o link copiado no app da loja (o iPhone pede para confirmar a colagem)
+  async function colarLink() {
+    try {
+      const texto = (await navigator.clipboard.readText()).trim();
+      if (texto) setCampos((atual) => ({ ...atual, link: texto }));
+    } catch {
+      setExtracao({ tipo: "aviso", texto: "Não foi possível colar automaticamente. Toque no campo e cole o link." });
+    }
+  }
 
   // Busca os dados pelo link e substitui os campos do formulário (nada é salvo até clicar em Salvar)
   async function extrairDados() {
@@ -92,13 +103,25 @@ export function FormularioProduto({ produto, categorias }: Props) {
     e.target.value = "";
     if (!arquivo) return;
     setErroImagem(null);
-    if (!TIPOS_IMAGEM.includes(arquivo.type)) return setErroImagem("Use uma imagem JPG, PNG ou WEBP.");
-    if (arquivo.size > TAMANHO_MAXIMO_IMAGEM) return setErroImagem("A imagem deve ter no máximo 5 MB.");
+    if (!arquivo.type.startsWith("image/")) return setErroImagem("Escolha uma imagem (foto da câmera ou da galeria).");
 
     setEnviandoImagem(true);
-    const caminho = `${crypto.randomUUID()}.${extensaoDoTipo(arquivo.type)}`;
+    // Foto de celular é grande: reduz e converte antes de enviar
+    let imagem: Blob;
+    try {
+      imagem = await comprimirImagem(arquivo);
+    } catch {
+      setEnviandoImagem(false);
+      return setErroImagem("Não foi possível ler essa foto. Tente outra ou envie em JPG ou PNG.");
+    }
+    if (!TIPOS_IMAGEM.includes(imagem.type) || imagem.size > TAMANHO_MAXIMO_IMAGEM) {
+      setEnviandoImagem(false);
+      return setErroImagem("A imagem ficou grande demais mesmo após a compressão. Tente outra foto.");
+    }
+
+    const caminho = `${crypto.randomUUID()}.${extensaoDoTipo(imagem.type)}`;
     const supabase = criarClienteNavegador();
-    const { error } = await supabase.storage.from(BUCKET_IMAGENS).upload(caminho, arquivo, { contentType: arquivo.type });
+    const { error } = await supabase.storage.from(BUCKET_IMAGENS).upload(caminho, imagem, { contentType: imagem.type });
     setEnviandoImagem(false);
     if (error) return setErroImagem(`Não foi possível enviar a imagem: ${error.message}`);
     const { data } = supabase.storage.from(BUCKET_IMAGENS).getPublicUrl(caminho);
@@ -137,7 +160,19 @@ export function FormularioProduto({ produto, categorias }: Props) {
 
         <Campo rotulo="Link da loja" erro={erros.link} dica="Cole o link e clique em Extrair dados para preencher os campos.">
           <div className="painel-linha">
-            <input name="link" type="url" placeholder="https://…" value={campos.link} onChange={alterar("link")} />
+            <input
+              name="link"
+              type="url"
+              inputMode="url"
+              autoCapitalize="off"
+              autoCorrect="off"
+              placeholder="https://…"
+              value={campos.link}
+              onChange={alterar("link")}
+            />
+            <button type="button" className="painel-botao secundario" onClick={colarLink}>
+              Colar
+            </button>
             <button
               type="button"
               className="painel-botao secundario"
@@ -167,12 +202,23 @@ export function FormularioProduto({ produto, categorias }: Props) {
           <textarea name="descricao_longa" rows={4} value={campos.descricao_longa} onChange={alterar("descricao_longa")} />
         </Campo>
 
-        <Campo rotulo="Imagem" erro={erros.imagem_url ?? erroImagem ?? undefined} dica="Envie um arquivo (JPG, PNG ou WEBP, até 5 MB) ou cole uma URL.">
+        <Campo
+          rotulo="Imagem"
+          erro={erros.imagem_url ?? erroImagem ?? undefined}
+          dica="Tire uma foto, escolha da galeria ou cole uma URL. A foto é reduzida automaticamente antes do envio."
+        >
           <div className="painel-linha">
-            <input name="imagem_url" placeholder="https://… ou /images/…" value={campos.imagem_url} onChange={alterar("imagem_url")} />
+            <input
+              name="imagem_url"
+              inputMode="url"
+              autoCapitalize="off"
+              placeholder="https://… ou /images/…"
+              value={campos.imagem_url}
+              onChange={alterar("imagem_url")}
+            />
             <label className={`painel-botao secundario${enviandoImagem ? " desativado" : ""}`}>
-              {enviandoImagem ? "Enviando…" : "Enviar arquivo"}
-              <input type="file" accept={TIPOS_IMAGEM.join(",")} onChange={enviarImagem} disabled={enviandoImagem} hidden />
+              {enviandoImagem ? "Enviando…" : "📷 Foto"}
+              <input type="file" accept="image/*" onChange={enviarImagem} disabled={enviandoImagem} hidden />
             </label>
           </div>
         </Campo>
@@ -223,7 +269,7 @@ export function FormularioProduto({ produto, categorias }: Props) {
         {estado.mensagem && <p className="painel-alerta erro">{estado.mensagem}</p>}
         {Object.keys(erros).length > 0 && <p className="painel-alerta erro">Confira os campos destacados.</p>}
 
-        <div className="painel-linha">
+        <div className="painel-linha painel-acoes-form">
           <button type="submit" className="painel-botao" disabled={salvando || enviandoImagem}>
             {salvando ? "Salvando…" : "Salvar"}
           </button>

@@ -133,6 +133,50 @@ export function TabelaProdutos({ produtos, categorias }: Props) {
         </table>
         {visiveis.length === 0 && <p className="painel-vazio">Nenhum produto encontrado.</p>}
       </div>
+
+      {/* No celular, a tabela vira cartões (o CSS mostra um ou outro conforme a largura da tela) */}
+      <div className={`painel-cartoes${pendente ? " pendente" : ""}`}>
+        {visiveis.map((p) => (
+          <div key={p.id} className={`painel-cartao-produto${p.ativo ? "" : " inativo"}`}>
+            <div className="painel-cartao-topo">
+              {p.imagem_url ? <img src={p.imagem_url} alt="" /> : <span className="sem-imagem">—</span>}
+              <div className="painel-cartao-info">
+                <span className="painel-cartao-nome">{p.nome}</span>
+                <span className="painel-cartao-meta">
+                  <span className={`painel-badge ${p.loja}`}>{LOJAS[p.loja].nome}</span>
+                  <strong>{formatarPreco(p.preco_por)}</strong>
+                </span>
+                {p.categoria_id && <span className="painel-dica">{nomeCategoria.get(p.categoria_id)}</span>}
+              </div>
+            </div>
+            <div className="painel-cartao-controles">
+              <label>
+                <Interruptor
+                  ligado={p.destaque}
+                  rotulo={`Destaque do dia: ${p.nome}`}
+                  onAlternar={() => executar(() => alternarProduto(p.id, "destaque", !p.destaque))}
+                />
+                Destaque
+              </label>
+              <label>
+                <Interruptor
+                  ligado={p.ativo}
+                  rotulo={`Ativo na vitrine: ${p.nome}`}
+                  onAlternar={() => executar(() => alternarProduto(p.id, "ativo", !p.ativo))}
+                />
+                Ativo
+              </label>
+              <Link href={`/dt-studio/produtos/${p.id}`} className="painel-link">
+                Editar
+              </Link>
+              <button type="button" className="painel-link perigo" onClick={() => excluir(p)}>
+                Excluir
+              </button>
+            </div>
+          </div>
+        ))}
+        {visiveis.length === 0 && <p className="painel-vazio">Nenhum produto encontrado.</p>}
+      </div>
       <p className="painel-rodape-tabela">
         {visiveis.length} de {produtos.length} produtos
       </p>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense, type ReactNode } from "react";
 import { exigirAdmin } from "@/lib/painel";
-import "../painel.css";
 import { sair } from "./acoes";
 import { MenuLinks, MenuPainel } from "./MenuPainel";
 
