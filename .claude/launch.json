@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vitrine-next",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "site-antigo",
+      "runtimeExecutable": "C:\\Users\\drika\\AppData\\Local\\Python\\bin\\python.exe",
+      "runtimeArgs": ["-m", "http.server", "5510", "--bind", "127.0.0.1"],
+      "port": 5510,
+      "autoPort": false
+    }
+  ]
+}
