@@ -13,3 +13,17 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Arquivos de public/ saem direto da CDN da Netlify, sem passar pelos headers() do next.config:
+# os cabeçalhos do service worker do app do painel precisam estar aqui também.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'"
+
+[[headers]]
+  for = "/manifest-painel.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json; charset=utf-8"

@@ -13,7 +13,11 @@ export function BotaoGoogle() {
     const supabase = criarClienteNavegador();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        // Sempre pergunta qual conta usar: sem isso, o Google reaproveita a última conta (mesmo não autorizada)
+        queryParams: { prompt: "select_account" },
+      },
     });
     // Sem erro, o navegador já está indo para o Google
     if (error) {
